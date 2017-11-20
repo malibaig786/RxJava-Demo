@@ -26,8 +26,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+//        subscribeOn();
 //        observeOn();
-        subscribeOn();
+
+//        subscribeOnInEnd();
+//        observeOnInEnd();
+
+//        subscribeOnObserveOn();
+        observeOnSubscribeOn();
+
 //        observeOn();
 //        groupBy();
 //        concatWith();
@@ -66,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(new Observer<Integer>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
-                        Log.e(TAG, "onSubscribe: Concat " + Thread.currentThread().getName());
+                        Log.e(TAG, "onSubscribe: " + Thread.currentThread().getName());
                         disposable.add(d);
                     }
 
@@ -82,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
-                        Log.e(TAG, "onComplete: Concat " + " Thread Name " + Thread.currentThread().getName());
+                        Log.e(TAG, "onComplete: Subscribe() method " + " Thread Name " + Thread.currentThread().getName());
                     }
                 });
     }
@@ -117,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(new Observer<Integer>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
-                        Log.e(TAG, "onSubscribe: Concat " + Thread.currentThread().getName());
+                        Log.e(TAG, "onSubscribe: " + Thread.currentThread().getName());
                         disposable.add(d);
                     }
 
@@ -133,13 +140,273 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
-                        Log.e(TAG, "onComplete: Concat " + " Thread Name " + Thread.currentThread().getName());
+                        Log.e(TAG, "onComplete: ObserveOn() " + " Thread Name " + Thread.currentThread().getName());
                     }
                 });
 
     }
 
+    private void subscribeOnInEnd() {
+        Log.w(TAG, "subscribeOn: Method");
+        Observable<Integer> seq1 = Observable.range(10, 6);
 
+        seq1
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "Filter " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "Map " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+                .doOnDispose(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        Log.e(TAG, "doOnDispose: " + Thread.currentThread().getName());
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Log.e(TAG, "onSubscribe: " + Thread.currentThread().getName());
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Integer integer) {
+                        Log.w(TAG, "onNext: " + integer + " Thread Name " + Thread.currentThread().getName());
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "onComplete: Subscribe() method " + " Thread Name " + Thread.currentThread().getName());
+                    }
+                });
+    }
+
+    private void observeOnInEnd() {
+        Log.w(TAG, "observeOn: method");
+        Observable<Integer> seq1 = Observable.range(10, 6);
+
+        seq1
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "Filter " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "Map " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+                .doOnDispose(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        Log.e(TAG, "doOnDispose: " + Thread.currentThread().getName());
+                    }
+                })
+                .observeOn(Schedulers.computation())
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Log.e(TAG, "onSubscribe: " + Thread.currentThread().getName());
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Integer integer) {
+                        Log.w(TAG, "onNext: " + integer + " Thread Name " + Thread.currentThread().getName());
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "onComplete: ObserveOn() " + " Thread Name " + Thread.currentThread().getName());
+                    }
+                });
+
+    }
+
+    private void subscribeOnObserveOn() {
+        Log.w(TAG, "subscribeOn: Method");
+        Observable<Integer> seq1 = Observable.range(10, 5);
+
+        seq1
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.w(TAG, "Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.w(TAG, "Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+                .observeOn(Schedulers.computation())
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.w(TAG, "ObserveOn " + Thread.currentThread().getName());
+                        Log.e(TAG, "Filter " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "Map " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+                .doOnDispose(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        Log.e(TAG, "doOnDispose: " + Thread.currentThread().getName());
+                    }
+                })
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Log.e(TAG, "onSubscribe: " + Thread.currentThread().getName());
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Integer integer) {
+                        Log.w(TAG, "onNext: " + integer + " Thread Name " + Thread.currentThread().getName());
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "onComplete: Subscribe() method " + " Thread Name " + Thread.currentThread().getName());
+                    }
+                });
+    }
+
+    private void observeOnSubscribeOn() {
+        Log.w(TAG, "subscribeOn: ObserveOnSubscribeOn() Method");
+        Observable<Integer> seq1 = Observable.range(10, 5);
+
+        seq1
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+                .observeOn(Schedulers.io())
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.w(TAG, "Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.w(TAG, "Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+//                .subscribeOn(Schedulers.computation())
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.w(TAG, "ObserveOn " + Thread.currentThread().getName());
+                        Log.e(TAG, "Filter " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "Map " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+                .doOnDispose(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        Log.e(TAG, "doOnDispose: " + Thread.currentThread().getName());
+                    }
+                })
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Log.e(TAG, "onSubscribe: " + Thread.currentThread().getName());
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Integer integer) {
+                        Log.w(TAG, "onNext: " + integer + " Thread Name " + Thread.currentThread().getName());
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "onComplete: Subscribe() method " + " Thread Name " + Thread.currentThread().getName());
+                    }
+                });
+    }
 
     @Override
     protected void onStop() {
