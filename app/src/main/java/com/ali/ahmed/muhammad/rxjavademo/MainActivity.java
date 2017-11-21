@@ -26,41 +26,46 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        subscribeOn();
-//        observeOn();
+//        subscribeOnAtStart();
+//        observeOnAtStart();
 
-//        subscribeOnInEnd();
-//        observeOnInEnd();
+//        subscribeOnInMiddle();
+        observeOnInMiddle();
+
+//        subscribeOnAtEnd();
+//        observeOnAtEnd();
 
 //        subscribeOnObserveOn();
-        observeOnSubscribeOn();
+//        observeOnSubscribeOn();
+
+//        twoSubscribeOn();
+//        twoObserveOn();
 
 //        observeOn();
 //        groupBy();
 //        concatWith();
 //        concat();
 //        fromIterable();
-
     }
 
-    private void subscribeOn() {
-        Log.w(TAG, "subscribeOn: Method");
+
+    private void subscribeOnAtStart() {
+        Log.w(TAG, "subscribeOnAtStart: Method");
         Observable<Integer> seq1 = Observable.range(10, 6);
 
         seq1
+                .subscribeOn(Schedulers.io())
                 .filter(new Predicate<Integer>() {
                     @Override
                     public boolean test(@NonNull Integer integer) throws Exception {
-                        Log.e(TAG, "Filter " + Thread.currentThread().getName());
+                        Log.e(TAG, "1) Filter " + integer + "  " + Thread.currentThread().getName());
                         return true;
                     }
                 })
-
-                .subscribeOn(Schedulers.io())
                 .map(new Function<Integer, Integer>() {
                     @Override
                     public Integer apply(@NonNull Integer integer) throws Exception {
-                        Log.e(TAG, "Map " + Thread.currentThread().getName());
+                        Log.e(TAG, "2) Map " + integer + "  " + Thread.currentThread().getName());
                         return integer;
                     }
                 })
@@ -94,24 +99,23 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void observeOn() {
-        Log.w(TAG, "observeOn: method");
+    private void observeOnAtStart() {
+        Log.w(TAG, "observeOnAtStart: method");
         Observable<Integer> seq1 = Observable.range(10, 6);
 
         seq1
+                .observeOn(Schedulers.computation())
                 .filter(new Predicate<Integer>() {
                     @Override
                     public boolean test(@NonNull Integer integer) throws Exception {
-                        Log.e(TAG, "Filter " + Thread.currentThread().getName());
+                        Log.e(TAG, "1) Filter " + integer + "  " + Thread.currentThread().getName());
                         return true;
                     }
                 })
-
-                .observeOn(Schedulers.io())
                 .map(new Function<Integer, Integer>() {
                     @Override
                     public Integer apply(@NonNull Integer integer) throws Exception {
-                        Log.e(TAG, "Map " + Thread.currentThread().getName());
+                        Log.e(TAG, "2) Map " + integer + "  " + Thread.currentThread().getName());
                         return integer;
                     }
                 })
@@ -140,13 +144,114 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
-                        Log.e(TAG, "onComplete: ObserveOn() " + " Thread Name " + Thread.currentThread().getName());
+                        Log.e(TAG, "onComplete: Subscribe() method " + " Thread Name " + Thread.currentThread().getName());
                     }
                 });
-
     }
 
-    private void subscribeOnInEnd() {
+
+    private void subscribeOnInMiddle() {
+        Log.w(TAG, "subscribeOnInMiddle: Method");
+        Observable<Integer> seq1 = Observable.range(10, 6);
+
+        seq1
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "1) Filter " + integer + "  " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "2) Map " + integer + "  " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+                .doOnDispose(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        Log.e(TAG, "doOnDispose: " + Thread.currentThread().getName());
+                    }
+                })
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Log.e(TAG, "onSubscribe: " + Thread.currentThread().getName());
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Integer integer) {
+                        Log.w(TAG, "onNext: " + integer + " Thread Name " + Thread.currentThread().getName());
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "onComplete: Subscribe() method " + " Thread Name " + Thread.currentThread().getName());
+                    }
+                });
+    }
+
+    private void observeOnInMiddle() {
+        Log.w(TAG, "observeOnInMiddle: method");
+        Observable<Integer> seq1 = Observable.range(10, 6);
+
+        seq1
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "1) Filter " + integer + "  " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+                .observeOn(Schedulers.computation())
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "2) Map " + integer + "  " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+                .doOnDispose(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        Log.e(TAG, "doOnDispose: " + Thread.currentThread().getName());
+                    }
+                })
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Log.e(TAG, "onSubscribe: " + Thread.currentThread().getName());
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Integer integer) {
+                        Log.w(TAG, "onNext: " + integer + " Thread Name " + Thread.currentThread().getName());
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "onComplete: Subscribe() method " + " Thread Name " + Thread.currentThread().getName());
+                    }
+                });
+    }
+
+
+    private void subscribeOnAtEnd() {
         Log.w(TAG, "subscribeOn: Method");
         Observable<Integer> seq1 = Observable.range(10, 6);
 
@@ -197,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void observeOnInEnd() {
+    private void observeOnAtEnd() {
         Log.w(TAG, "observeOn: method");
         Observable<Integer> seq1 = Observable.range(10, 6);
 
@@ -248,22 +353,23 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     private void subscribeOnObserveOn() {
-        Log.w(TAG, "subscribeOn: Method");
+        Log.w(TAG, "subscribeOnObserveOn() Method");
         Observable<Integer> seq1 = Observable.range(10, 5);
 
         seq1
                 .filter(new Predicate<Integer>() {
                     @Override
                     public boolean test(@NonNull Integer integer) throws Exception {
-                        Log.e(TAG, "Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        Log.e(TAG, "1) Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
                         return true;
                     }
                 })
                 .map(new Function<Integer, Integer>() {
                     @Override
                     public Integer apply(@NonNull Integer integer) throws Exception {
-                        Log.e(TAG, "Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        Log.e(TAG, "1) Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
                         return integer;
                     }
                 })
@@ -271,14 +377,15 @@ public class MainActivity extends AppCompatActivity {
                 .filter(new Predicate<Integer>() {
                     @Override
                     public boolean test(@NonNull Integer integer) throws Exception {
-                        Log.w(TAG, "Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        Log.w(TAG, "subscribeOn() Method" + Thread.currentThread().getName());
+                        Log.w(TAG, "2) Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
                         return true;
                     }
                 })
                 .map(new Function<Integer, Integer>() {
                     @Override
                     public Integer apply(@NonNull Integer integer) throws Exception {
-                        Log.w(TAG, "Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        Log.w(TAG, "2) Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
                         return integer;
                     }
                 })
@@ -286,15 +393,15 @@ public class MainActivity extends AppCompatActivity {
                 .filter(new Predicate<Integer>() {
                     @Override
                     public boolean test(@NonNull Integer integer) throws Exception {
-                        Log.w(TAG, "ObserveOn " + Thread.currentThread().getName());
-                        Log.e(TAG, "Filter " + Thread.currentThread().getName());
+                        Log.w(TAG, "observeOn() Method" + Thread.currentThread().getName());
+                        Log.e(TAG, "3) Filter " + Thread.currentThread().getName());
                         return true;
                     }
                 })
                 .map(new Function<Integer, Integer>() {
                     @Override
                     public Integer apply(@NonNull Integer integer) throws Exception {
-                        Log.e(TAG, "Map " + Thread.currentThread().getName());
+                        Log.e(TAG, "3) Map " + Thread.currentThread().getName());
                         return integer;
                     }
                 })
@@ -329,21 +436,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void observeOnSubscribeOn() {
-        Log.w(TAG, "subscribeOn: ObserveOnSubscribeOn() Method");
+        Log.w(TAG, "ObserveOnSubscribeOn() Method");
         Observable<Integer> seq1 = Observable.range(10, 5);
 
         seq1
                 .filter(new Predicate<Integer>() {
                     @Override
                     public boolean test(@NonNull Integer integer) throws Exception {
-                        Log.e(TAG, "Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        Log.e(TAG, "1) Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
                         return true;
                     }
                 })
                 .map(new Function<Integer, Integer>() {
                     @Override
                     public Integer apply(@NonNull Integer integer) throws Exception {
-                        Log.e(TAG, "Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        Log.e(TAG, "1) Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
                         return integer;
                     }
                 })
@@ -351,30 +458,31 @@ public class MainActivity extends AppCompatActivity {
                 .filter(new Predicate<Integer>() {
                     @Override
                     public boolean test(@NonNull Integer integer) throws Exception {
-                        Log.w(TAG, "Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        Log.w(TAG, "ObserveOn() Method " + Thread.currentThread().getName());
+                        Log.w(TAG, "2) Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
                         return true;
                     }
                 })
                 .map(new Function<Integer, Integer>() {
                     @Override
                     public Integer apply(@NonNull Integer integer) throws Exception {
-                        Log.w(TAG, "Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        Log.w(TAG, "2) Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
                         return integer;
                     }
                 })
-//                .subscribeOn(Schedulers.computation())
+                .subscribeOn(Schedulers.computation())
                 .filter(new Predicate<Integer>() {
                     @Override
                     public boolean test(@NonNull Integer integer) throws Exception {
-                        Log.w(TAG, "ObserveOn " + Thread.currentThread().getName());
-                        Log.e(TAG, "Filter " + Thread.currentThread().getName());
+                        Log.w(TAG, "subscribeOn() Method" + Thread.currentThread().getName());
+                        Log.e(TAG, "3) Filter " + Thread.currentThread().getName());
                         return true;
                     }
                 })
                 .map(new Function<Integer, Integer>() {
                     @Override
                     public Integer apply(@NonNull Integer integer) throws Exception {
-                        Log.e(TAG, "Map " + Thread.currentThread().getName());
+                        Log.e(TAG, "3) Map " + Thread.currentThread().getName());
                         return integer;
                     }
                 })
@@ -407,6 +515,170 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
+
+    private void twoSubscribeOn() {
+        Log.w(TAG, "twoSubscribeOn() Method");
+        Observable<Integer> seq1 = Observable.range(10, 5);
+
+        seq1
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "1) Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "1) Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.w(TAG, "First subscribeOn() Method " + Thread.currentThread().getName());
+                        Log.w(TAG, "2) Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.w(TAG, "2) Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+                .subscribeOn(Schedulers.computation())
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.w(TAG, "Second subscribeOn() Method" + Thread.currentThread().getName());
+                        Log.e(TAG, "3) Filter " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "3) Map " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+                .doOnDispose(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        Log.e(TAG, "doOnDispose: " + Thread.currentThread().getName());
+                    }
+                })
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Log.e(TAG, "onSubscribe: " + Thread.currentThread().getName());
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Integer integer) {
+                        Log.w(TAG, "onNext: " + integer + " Thread Name " + Thread.currentThread().getName());
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "onComplete: Subscribe() method " + " Thread Name " + Thread.currentThread().getName());
+                    }
+                });
+    }
+
+    private void twoObserveOn() {
+        Log.w(TAG, "twoObserveOn() Method");
+        Observable<Integer> seq1 = Observable.range(10, 5);
+
+        seq1
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "1) Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "1) Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+                .observeOn(Schedulers.io())
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.w(TAG, "First ObserveOn() Method " + Thread.currentThread().getName());
+                        Log.w(TAG, "2) Filter: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.w(TAG, "2) Map: " + integer + "  ThreadName: " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+                .observeOn(Schedulers.computation())
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(@NonNull Integer integer) throws Exception {
+                        Log.w(TAG, "Second observer() Method " + Thread.currentThread().getName());
+                        Log.e(TAG, "3) Filter " + Thread.currentThread().getName());
+                        return true;
+                    }
+                })
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(@NonNull Integer integer) throws Exception {
+                        Log.e(TAG, "3) Map " + Thread.currentThread().getName());
+                        return integer;
+                    }
+                })
+                .doOnDispose(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        Log.e(TAG, "doOnDispose: " + Thread.currentThread().getName());
+                    }
+                })
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Log.e(TAG, "onSubscribe: " + Thread.currentThread().getName());
+                        disposable.add(d);
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Integer integer) {
+                        Log.w(TAG, "onNext: " + integer + " Thread Name " + Thread.currentThread().getName());
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "onComplete: Subscribe() method " + " Thread Name " + Thread.currentThread().getName());
+                    }
+                });
+    }
+
 
     @Override
     protected void onStop() {
