@@ -30,13 +30,19 @@ public class MainActivity extends AppCompatActivity {
 //        observeOnAtStart();
 
 //        subscribeOnInMiddle();
-        observeOnInMiddle();
+//        observeOnInMiddle();
 
 //        subscribeOnAtEnd();
 //        observeOnAtEnd();
 
 //        subscribeOnObserveOn();
-//        observeOnSubscribeOn();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                observeOnSubscribeOn();
+            }
+        }).start();
+
 
 //        twoSubscribeOn();
 //        twoObserveOn();
@@ -440,6 +446,7 @@ public class MainActivity extends AppCompatActivity {
         Observable<Integer> seq1 = Observable.range(10, 5);
 
         seq1
+                .subscribeOn(Schedulers.io())
                 .filter(new Predicate<Integer>() {
                     @Override
                     public boolean test(@NonNull Integer integer) throws Exception {
